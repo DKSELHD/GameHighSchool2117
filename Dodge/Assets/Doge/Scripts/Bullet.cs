@@ -12,7 +12,7 @@ public class Bullet : MonoBehaviour
 
     // Update is called once per frame
 
-    public float m_Speed = 6f;
+    public float m_Speed = 4f;
     public float m_DestroyCooltime = 5f;
     void Update()
     {
@@ -23,8 +23,7 @@ public class Bullet : MonoBehaviour
         m_DestroyCooltime -= Time.deltaTime;
 
         if (m_DestroyCooltime <= 0)
-            gameObject.SetActive(false);
-        
+            Destroy(gameObject);        
     }
 
     private void OnTriggerEnter(Collider other)

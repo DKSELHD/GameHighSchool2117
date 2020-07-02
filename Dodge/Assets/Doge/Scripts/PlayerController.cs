@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
 
-    public float m_Speed = 6f;
+    public float m_Speed = 3f;
     void Update()
     {
 
@@ -26,10 +26,7 @@ public class PlayerController : MonoBehaviour
         rigidbody.AddForce(new Vector3(xAxis, 0, yAxis) * m_Speed);
 
 
-        float fireAxis = Input.GetAxis("Fire1");
-
-        if (fireAxis > 0.95f)
-            Die();
+        
     }
 
     public void Die()
