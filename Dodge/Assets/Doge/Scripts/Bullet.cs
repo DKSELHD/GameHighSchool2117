@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+
+    
     // Start is called before the first frame update
     void Start()
     {
-        
+       
+
     }
 
+    public Vector3 m_Velocity;
     // Update is called once per frame
 
     public float m_Speed = 4f;
@@ -18,7 +22,7 @@ public class Bullet : MonoBehaviour
     {
         Rigidbody rigidbody = /*gameObject.*/GetComponent<Rigidbody>();
 
-        rigidbody.AddForce(transform.forward * m_Speed);
+        rigidbody.velocity = m_Velocity * m_Speed;
 
         m_DestroyCooltime -= Time.deltaTime;
 

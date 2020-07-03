@@ -24,6 +24,9 @@ public class RotationBulletSpawner : MonoBehaviour
             bullet.transform.position = transform.position;
             bullet.transform.rotation = transform.rotation;
 
+            var  b = bullet.GetComponent<Bullet>();
+            b.m_Velocity = transform.forward;
+
             // 공격 선쿨타임 초기화.
             m_AttackCooltime = 0;
         }
