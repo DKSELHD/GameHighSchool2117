@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
+
+    public GameManager m_Gamemanager;
     void Start()
     {
         
@@ -32,6 +34,9 @@ public class PlayerController : MonoBehaviour
     public void Die()
     {
         Debug.Log("사망");
-        gameObject.SetActive(false);
+        m_Gamemanager.GameOver();
+
+
+
     }
 }

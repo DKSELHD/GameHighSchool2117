@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Doge/scenes/Level_main.unity
+    guid: db04af359a56c83468fb031fca8706f1
   m_configObjects: {}
