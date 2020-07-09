@@ -32,7 +32,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.attachedRigidbody.tag == "Player")
+        if (other.attachedRigidbody != null && other.attachedRigidbody.tag == "Player")
         {
             PlayerController player = other.attachedRigidbody.GetComponent<PlayerController>();
             player.Die();
