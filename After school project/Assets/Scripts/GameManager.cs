@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
+    public CubeSpawner m_CubeSpawner;
     public int m_Lifecount = 3;
     public int m_Scroe = 0;
 
@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+
+        m_CubeSpawner.SpawnStart();
     }
 
     public void AddScore()
@@ -28,6 +30,7 @@ public class GameManager : MonoBehaviour
         if(m_Lifecount <= 0)
         {
             //GameOver;
+            m_CubeSpawner.gameObject.SetActive(false);
         }
     }
 }
