@@ -12,12 +12,12 @@ public class JoinArm : MonoBehaviour
 
     void Start()
     {
-        m_offset = transform.position = m_Target.transform.position;
+        m_offset = transform.position - m_Target.transform.position;
     }
 
     void FixedUpdate()
     {
-        Vector3 targetPosition = target.transform.position + m_offset;
+        Vector3 targetPosition = m_Target.transform.position + m_offset;
         transform.position = m_Target.transform.position + m_offset;
     }
 }
