@@ -13,7 +13,7 @@ public class PlayController : MonoBehaviour
 
     public float m_YJumpPower = 3f;
 
-    public int m_JumpCount = 1;
+    public int m_JumpCount = 0;
 
     protected void Start()
     {
@@ -43,6 +43,9 @@ public class PlayController : MonoBehaviour
             m_JumpCount++;
         }
 
+        var animator = GetComponent<Animator>();
+        animator.SetFloat("velocity Y", velocity.y);
+
        
     }
 
@@ -57,6 +60,12 @@ public class PlayController : MonoBehaviour
             }
         }
     }
+
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if ( collision.tag == "Ladder";
+
+    //}
 }
     
 
