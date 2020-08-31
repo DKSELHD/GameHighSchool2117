@@ -15,10 +15,14 @@ public class PlayController : MonoBehaviour
 
     public int m_JumpCount = 0;
 
+    public Animator m_Animator;
+    public bool m_IsJumping = false;
+
+
     protected void Start()
     {
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
-
+        m_Animator = GetComponent<Animator>();
     }
 
     protected void Update()
@@ -43,8 +47,15 @@ public class PlayController : MonoBehaviour
             m_JumpCount++;
         }
 
-        var animator = GetComponent<Animator>();
-        animator.SetFloat("velocity Y", velocity.y);
+        m_IsJumping = Mathf.Abs(velocity.y) >= 0.1f ? true : false;
+
+        m_Animator.SetBool("isJumping", m_IsJumping);
+        m_Animator.SetFloat("velocity X", Mathf.Abs(xAxis));
+        //var animator = GetComponent<Animator>();
+        //animator.SetFloat("velocity Y", velocity.y);
+
+        //점프 애니메이션
+        m_Animator.SetFloat("velocity Y", velocity.y);
 
        
     }
