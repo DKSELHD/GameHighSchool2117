@@ -124,6 +124,13 @@ public class PlayController : MonoBehaviour
         {
             m_IsTouchLadder = true;
         }
+        else if(collision.tag == "Item")
+        {
+            ItemComponent item = collision.
+                GetComponent<ItemComponent>();
+            if (item != null)
+                item.BeAte();
+        }
 
 
     }
