@@ -104,6 +104,8 @@ public class PlayController : MonoBehaviour
         m_Rigidbody2D.constraints =
             m_Rigidbody2D.constraints & ~RigidbodyConstraints2D.FreezePosition;
         m_IsClimbing = false;
+
+        m_Animator.SetBool("IsClibing", m_IsClimbing);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -114,6 +116,14 @@ public class PlayController : MonoBehaviour
             if (contact.normal.y > 0.5f)
             {
                 m_JumpCount = 0;
+            }
+            if (contact.rigidbody)
+            {
+                var hp = contact.rigidbody.GetComponent<HPComponent>();
+                if (hp)
+                {
+                    Destroy(hp.gameObject);
+                }
             }
         }
     }
@@ -144,6 +154,9 @@ public class PlayController : MonoBehaviour
             ClimbingExit();
         }
     }
+
+    
+    
 
     //private void OnTriggerEnter2D(Collider2D collision)
     //{
