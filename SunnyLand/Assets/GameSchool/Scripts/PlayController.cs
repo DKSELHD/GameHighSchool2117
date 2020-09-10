@@ -112,19 +112,31 @@ public class PlayController : MonoBehaviour
     {
         foreach (ContactPoint2D contact in collision.contacts)
         {
-            Debug.DrawRay(contact.point, contact.normal, Color.white);
+            //Debug.DrawRay(contact.point, contact.normal, Color.white);
             if (contact.normal.y > 0.5f)
             {
                 m_JumpCount = 0;
-            }
-            if (contact.rigidbody)
-            {
-                var hp = contact.rigidbody.GetComponent<HPComponent>();
-                if (hp)
+
+                if (contact.rigidbody)
                 {
-                    Destroy(hp.gameObject);
+                    var hp = contact.rigidbody.GetComponent<HPComponent>();
+
+                    if (hp)
+                    {
+                        hp.TakeDamage(10);
+                    }
                 }
             }
+            
+            else if (contact.rigidbody && contact.rigidbody.tag == "Enemy")
+            {
+                var hp = GetComponent<HPComponent>();
+                hp.TakeDamage(10);
+
+
+                m_Animator.SetTrigger("TakeDamage");
+            }
+            
         }
     }
 
