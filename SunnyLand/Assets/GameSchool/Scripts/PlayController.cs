@@ -24,6 +24,8 @@ public class PlayController : MonoBehaviour
 
     public float m_ClimbSpeed = 5f;
 
+    public float m_HitReconveringTime = 0;
+
 
     protected void Start()
     {
@@ -35,6 +37,20 @@ public class PlayController : MonoBehaviour
     {
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
+
+        m_HitReconveringTime -= Time.deltaTime;
+        
+        if(m_HitReconveringTime > 0)
+        {
+            ClimbingExit();
+
+            m_Animator.SetBool("TakingDamage", true);
+            return;
+        }
+        else
+        {
+            m_Animator.SetBool("TakingDamage", false);
+        }
 
         if(m_IsTouchLadder && Mathf.Abs(yAxis) > 0.5f)
         {
@@ -99,6 +115,8 @@ public class PlayController : MonoBehaviour
         
     }
 
+    
+
     private void ClimbingExit()
     {
         m_Rigidbody2D.constraints =
@@ -130,11 +148,18 @@ public class PlayController : MonoBehaviour
             
             else if (contact.rigidbody && contact.rigidbody.tag == "Enemy")
             {
-                var hp = GetComponent<HPComponent>();
-                hp.TakeDamage(10);
+                if(m_HitReconveringTime <= 0)
+                {
+                    var hp = GetComponent<HPComponent>();
+                    hp.TakeDamage(10);
 
+                    m_HitReconveringTime = 1f;
+                }
+                //if(m_HitReconveringTime <=0) // 피격시 무제한, 무적
+               
+                
 
-                m_Animator.SetTrigger("TakeDamage");
+                //m_Animator.SetTrigger("TakeDamage");
             }
             
         }
