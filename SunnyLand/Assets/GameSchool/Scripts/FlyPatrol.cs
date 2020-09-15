@@ -11,12 +11,17 @@ public class FlyPatrol : MonoBehaviour
     public Vector3 m_PatrolOffset;
 
     private float m_PatrolTime;
-    public bool m_Go = true;
+    //public bool m_Go = true;
 
     public void Start()
     {
         m_StartPps = transform.position;
 
+        m_PatrolPos = transform.position + m_PatrolOffset;
+    }
+
+    public void ResetPatrolPos()
+    {
         m_PatrolPos = transform.position + m_PatrolOffset;
     }
 
