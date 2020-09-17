@@ -26,6 +26,15 @@ public class PlayController : MonoBehaviour
 
     public float m_HitReconveringTime = 0;
 
+    public VariableJoystick m_Joystick;
+
+    private bool m_InputJump = false;
+
+    public void Jump()
+    {
+        m_InputJump = true;
+    }
+
 
     protected void Start()
     {
@@ -37,6 +46,12 @@ public class PlayController : MonoBehaviour
     {
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
+
+        xAxis += m_Joystick.Horizontal;
+        yAxis += m_Joystick.Vertical;
+
+        var inputJump = m_InputJump;
+        m_InputJump = false;
 
         m_HitReconveringTime -= Time.deltaTime;
         
@@ -68,8 +83,10 @@ public class PlayController : MonoBehaviour
             else if (xAxis < 0)
                 m_Sprite.localScale = new Vector3(-1, 1, 1);
 
-            if (Input.GetKeyDown(KeyCode.UpArrow)
-                && m_JumpCount <= 0)
+            if ((Input.GetKeyDown(KeyCode.Space)
+                || inputJump )
+                && m_JumpCount <= 1
+                )
             {
                 m_Rigidbody2D.AddForce(Vector3.up * m_YJumpPower);
 
@@ -102,7 +119,8 @@ public class PlayController : MonoBehaviour
 
             transform.position += movement;
 
-            if(Input.GetKeyDown(KeyCode.Space))
+            if(Input.GetKeyDown(KeyCode.Space)
+                || inputJump)
             {
                 ClimbingExit();
             }

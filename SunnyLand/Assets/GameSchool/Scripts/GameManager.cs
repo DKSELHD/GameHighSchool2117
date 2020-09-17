@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     public Transform m_Target;
 
     public JointArm m_JointArm;
+    public VariableJoystick m_Joystick;
+
+    public UnityEngine.UI.Button m_JumpButton;
 
     // 수정
     public void GameOver()
@@ -35,14 +38,21 @@ public class GameManager : MonoBehaviour
     
     public void GameStart()
     {
-        var playerInInstantiate =  Instantiate(m_Player,
+        var playerInstance =  Instantiate(m_Player,
             m_StartPoint.position, m_StartPoint.rotation);
 
         // 중요
-        var hpComponent = playerInInstantiate.GetComponent<HPComponent>();
+        var hpComponent = playerInstance.GetComponent<HPComponent>();
         hpComponent.m_OnDie.AddListener(GameOver);
 
-        m_JointArm.m_Target = playerInInstantiate.transform;
+        m_JointArm.m_Target = playerInstance.transform;
+
+        var playerController = playerInstance.
+            GetComponent<PlayController>();
+        playerController.m_Joystick = m_Joystick;
+
+        m_JumpButton.onClick.AddListener(
+            playerController.Jump);
 
         Debug.Log("GameStart");
     }
