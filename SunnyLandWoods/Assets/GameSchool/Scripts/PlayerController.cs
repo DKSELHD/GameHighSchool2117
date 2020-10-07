@@ -23,4 +23,23 @@ public class PlayerController : MonoBehaviour
 
         m_Rigidbody2D.velocity = velocity;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+       foreach (var contact in collision.contacts)
+        {
+            if(contact.normal.y > -0.8f)
+            {
+                Vector2 velocity = m_Rigidbody2D.velocity;
+
+                if (velocity.y > 0)
+                    velocity.y = 0;
+
+                m_Rigidbody2D.velocity = velocity;
+
+            }
+        }
+    }
+
+
 }

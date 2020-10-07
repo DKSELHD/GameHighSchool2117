@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 2637247219
+    locked: 0
+  - name: Middleground
+    uniqueID: 1448321349
+    locked: 0
+  - name: Plane
+    uniqueID: 3513608381
+    locked: 0
+  - name: Character
+    uniqueID: 3453682709
+    locked: 0
+  - name: Player
+    uniqueID: 2826023423
+    locked: 0
