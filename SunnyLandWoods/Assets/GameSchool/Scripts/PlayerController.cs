@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
         None = 0,    //초기 상태
         Idle,
         Walking,
-        Jumping
+        Jumping,
+        Crouching,
     }
 
     public State m_State = State.None;
@@ -26,6 +27,9 @@ public class PlayerController : MonoBehaviour
     public bool m_IsGround;
     public int m_AttachedGroundCount = 0;
     public List<GameObject> m_AttachedGround = new List<GameObject>();
+    public Collider2D m_MovementCollider;
+    public Collider2D m_SideBlockCollider;
+    public float m_Crouchingtimer = 0f;
     #endregion //상태값
 
     #region 입력값
@@ -39,6 +43,7 @@ public class PlayerController : MonoBehaviour
         m_Animator.ResetTrigger("Idle");
         m_Animator.ResetTrigger("Walking");
         m_Animator.ResetTrigger("Jumpping");
+        m_Animator.ResetTrigger("Crouching");
 
         switch (state)
         {
@@ -57,6 +62,12 @@ public class PlayerController : MonoBehaviour
             case State.Jumping:
                 {
                     m_Animator.SetTrigger("Jumpping");
+                }
+                break;
+            case State.Crouching:
+                {
+                    m_Animator.SetTrigger("Crouching");
+                    m_Crouchingtimer = 0f;
                 }
                 break;
             default:
@@ -80,6 +91,11 @@ public class PlayerController : MonoBehaviour
                 break;
             case State.Jumping:
                 break;
+            case State.Crouching:
+                m_MovementCollider.enabled = true;
+                m_MovementCollider.enabled = false;
+                break;
+
             default:
                 break;
         }
@@ -105,6 +121,12 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             case State.Jumping:
+                {
+                    m_xAxis = Input.GetAxis("Horizontal");
+                    m_yAxis = Input.GetAxis("Vertical");
+                }
+                break;
+            case State.Crouching:
                 {
                     m_xAxis = Input.GetAxis("Horizontal");
                     m_yAxis = Input.GetAxis("Vertical");
@@ -170,6 +192,14 @@ public class PlayerController : MonoBehaviour
                 break;
             case State.Jumping:
                 {
+                    if(Mathf.Abs(m_xAxis) > 0.1f)
+                    {
+                        Vector2 velocity = m_Rigidbody2D.velocity;
+                        velocity.x = m_xAxis * m_MovementSpeed;
+                        m_Rigidbody2D.velocity = velocity;
+                    }
+
+
                     //땅에 닫고 있고,
                     //떨어지고 있을 경우에
                     if (m_AttachedGroundCount >= 1 && m_Rigidbody2D.velocity.y <= 0)
@@ -178,6 +208,34 @@ public class PlayerController : MonoBehaviour
                             ChangeState(State.Idle);
                         else
                             ChangeState(State.Walking);
+                    }
+                }
+                break;
+
+            case State.Crouching:
+                {
+                    if(m_xAxis >= 0)
+                    {
+                        ChangeState(State.Idle);
+                         
+                    }
+                    m_Crouchingtimer += Time.fixedDeltaTime;
+
+                    if(m_Crouchingtimer >= 2f && m_Crouchingtimer <= 90f)
+                    {
+
+                        //사이드블록 콜린더와
+                        m_MovementCollider.enabled = false;
+                        m_SideBlockCollider.enabled = false;
+
+                        m_Crouchingtimer = 100f; 
+                        
+                        
+                    }
+                    else if(m_Crouchingtimer >= 100.5f)
+                    {
+                        m_MovementCollider.enabled = true;
+                        m_SideBlockCollider.enabled = true;
                     }
                 }
                 break;
@@ -282,6 +340,26 @@ public class PlayerController : MonoBehaviour
             //밟고 있는 땅에 대한 중복처리
             if (m_AttachedGround.Contains(collision.collider.gameObject))
                 m_AttachedGround.Remove(collision.collider.gameObject);
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.collider.tag == "Ground")
+        {
+            if (m_AttachedGround.Contains(collision.collider.gameObject))
+                m_AttachedGround.Remove(collision.collider.gameObject);
+
+            foreach (var contact in collision.contacts)
+            {
+                if (contact.normal.y >= 0.5f)
+                {
+                    if (!m_AttachedGround.Contains(collision.collider.gameObject))
+                        m_AttachedGround.Add(collision.collider.gameObject);
+
+                    break;
+                }
+            }
         }
     }
 
