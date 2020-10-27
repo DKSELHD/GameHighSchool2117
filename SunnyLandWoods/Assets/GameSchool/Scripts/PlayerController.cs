@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
         Walking,
         Jumping,
         Crouching,
+        Hurt,
     }
 
     public State m_State = State.None;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
     public Animator m_Animator;
     public Collider2D m_MovementCollider;
     public Collider2D m_SideBlockCollider;
+    public Collider2D m_HitBox;
     #endregion //참조
 
     #region 상태값
@@ -29,6 +31,7 @@ public class PlayerController : MonoBehaviour
     public bool m_IsGround;
 
     public float m_CrouchTimer = 0;
+    public float m_HurtTimer = 0;
     #endregion //상태값
 
     #region 입력값
@@ -68,12 +71,26 @@ public class PlayerController : MonoBehaviour
                     m_CrouchTimer = 0f;
                 }
                 break;
+            case State.Hurt:
+                m_Rigidbody2D.velocity = Vector3.up * 10f;
+                m_Animator.SetTrigger("Hurt");
+                StartCoroutine(Immune());
+                break;
             default:
                 break;
         }
     }
 
+    IEnumerator Immune()
+    {
+        m_HitBox.enabled = false;
+        yield return new WaitForSeconds(0.6f);
 
+        ChangeState(State.Idle);
+
+        yield return new WaitForSeconds(2f);
+        m_HitBox.enabled = true;
+    }
     public void ExitState(State state)
     {
         switch (state)
@@ -92,6 +109,8 @@ public class PlayerController : MonoBehaviour
             case State.Crouching:
                 m_MovementCollider.enabled = true;
                 m_SideBlockCollider.enabled = true;
+                break;
+            case State.Hurt:
                 break;
             default:
                 break;
@@ -129,9 +148,18 @@ public class PlayerController : MonoBehaviour
                     m_yAxis = Input.GetAxis("Vertical");
                 }
                 break;
+            case State.Hurt:
+                m_xAxis = 0;
+                m_yAxis = 0;
+                break;
             default:
                 break;
         }
+    }
+
+    public void Hurt()
+    {
+        ChangeState(State.Hurt);
     }
 
     public void FixedUpdateProcess(State state)
@@ -232,6 +260,8 @@ public class PlayerController : MonoBehaviour
                     }
                 }
                 break;
+            case State.Hurt:
+                break;
             default:
                 break;
         }
@@ -266,6 +296,8 @@ public class PlayerController : MonoBehaviour
                     else if (m_xAxis < 0)
                         m_Renderer.flipX = true;
                 }
+                break;
+            case State.Hurt:
                 break;
             default:
                 break;
