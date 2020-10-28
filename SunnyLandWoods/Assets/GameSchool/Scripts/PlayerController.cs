@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerController : MonoBehaviour
         Jumping,
         Crouching,
         Hurt,
+        Die,
     }
 
     public State m_State = State.None;
@@ -22,6 +24,7 @@ public class PlayerController : MonoBehaviour
     public Collider2D m_MovementCollider;
     public Collider2D m_SideBlockCollider;
     public Collider2D m_HitBox;
+    public Collider2D m_AttackBox;
     #endregion //참조
 
     #region 상태값
@@ -38,6 +41,14 @@ public class PlayerController : MonoBehaviour
     public float m_xAxis;
     public float m_yAxis;
     #endregion //입력값
+
+    public void SetAttackBox(bool enable)
+    {
+        if (enable)
+            m_AttackBox.enabled = true;
+        else
+            m_AttackBox.enabled = false;
+    }
 
     public void EnterState(State state)
     {
@@ -63,6 +74,7 @@ public class PlayerController : MonoBehaviour
             case State.Jumping:
                 {
                     m_Animator.SetTrigger("Jumpping");
+                    SetAttackBox(true);
                 }
                 break;
             case State.Crouching:
@@ -76,11 +88,36 @@ public class PlayerController : MonoBehaviour
                 m_Animator.SetTrigger("Hurt");
                 StartCoroutine(Immune());
                 break;
+            case State.Die:
+                m_Rigidbody2D.velocity = Vector3.up * 20f;
+                m_Animator.SetTrigger("Die");
+                StartCoroutine(DieProcess());
+                break;
             default:
                 break;
         }
     }
 
+    IEnumerator DieProcess()
+    {
+        var arm = Camera.main.gameObject.GetComponent<SmoothJointArm>();
+        if (arm != null)
+            arm.target = null;
+
+        m_HitBox.enabled = false;
+        m_SideBlockCollider.enabled = false;
+        m_MovementCollider.enabled = false;
+        yield return new WaitForSeconds(4f);
+
+        OnPlayerDie.Invoke();
+    }
+
+    public UnityEvent OnPlayerDie;
+
+    public void Die()
+    {
+        ChangeState(State.Die);
+    }
     IEnumerator Immune()
     {
         m_HitBox.enabled = false;
@@ -88,9 +125,10 @@ public class PlayerController : MonoBehaviour
 
         ChangeState(State.Idle);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
         m_HitBox.enabled = true;
     }
+
     public void ExitState(State state)
     {
         switch (state)
@@ -105,12 +143,15 @@ public class PlayerController : MonoBehaviour
             case State.Walking:
                 break;
             case State.Jumping:
+                SetAttackBox(false);
                 break;
             case State.Crouching:
                 m_MovementCollider.enabled = true;
                 m_SideBlockCollider.enabled = true;
                 break;
             case State.Hurt:
+                break;
+            case State.Die:
                 break;
             default:
                 break;

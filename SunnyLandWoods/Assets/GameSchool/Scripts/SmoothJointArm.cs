@@ -9,8 +9,12 @@ public class SmoothJointArm : MonoBehaviour
     public Vector3 offset = new Vector3(0, 0, -10);
     private Vector3 velocity = Vector3.zero;
 
-    private void Update()
+    void Update()
     {
+
+        if (target == null)
+            return;
+
         // Define a target position above and behind the target ransform
         Vector3 targetPosition = target.TransformPoint(offset);
 
