@@ -21,15 +21,10 @@ public class PlayerMovement : MonoBehaviour {
     private void FixedUpdate() {
         // 물리 갱신 주기마다 움직임, 회전, 애니메이션 처리 실행 
 
-        // 앞 뒤 움직임
-        transform.position += transform.forward 
-            * moveSpeed 
-            * Time.fixedDeltaTime 
-            * playerInput.move;
+        Move();
 
-        // 좌우 회전
-        transform.Rotate(0, 
-            rotateSpeed * Time.fixedDeltaTime * playerInput.rotate, 0);
+        Rotate();
+        
 
         // 앞 뒤 움직일 때 
         playerAnimator.SetFloat("Move", playerInput.move);
@@ -38,11 +33,15 @@ public class PlayerMovement : MonoBehaviour {
 
     // 입력값에 따라 캐릭터를 앞뒤로 움직임
     private void Move() {
-
+        transform.position += transform.forward
+            * moveSpeed
+            * Time.fixedDeltaTime
+            * playerInput.move;
     }
 
     // 입력값에 따라 캐릭터를 좌우로 회전
     private void Rotate() {
-
+        transform.Rotate(0,
+            rotateSpeed * Time.fixedDeltaTime * playerInput.rotate, 0);
     }
 }
