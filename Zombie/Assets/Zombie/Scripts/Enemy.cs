@@ -42,6 +42,9 @@ public class Enemy : LivingEntity {
         enemyAudioPlayer = GetComponent<AudioSource>();
         enemyRenderer = GetComponent<Renderer>();
         enemyAnimator = GetComponent<Animator>();
+
+        pathFinder = GetComponent<NavMeshAgent>();
+
     }
 
     // 적 AI의 초기 스펙을 결정하는 셋업 메서드
@@ -56,6 +59,14 @@ public class Enemy : LivingEntity {
     private void Update() {
         // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
         enemyAnimator.SetBool("HasTarget", hasTarget);
+
+        //if(targetEntity != null && !targetEntity.dead)
+        //{
+        //    var offset = targetEntity.transform.position - transform.position;
+        //    var direction = offset.normalized;
+
+        //    transform.position += direction * 1f * Time.deltaTime;
+        //}
     }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
@@ -65,6 +76,19 @@ public class Enemy : LivingEntity {
         {
             // 0.25초 주기로 처리 반복
             yield return new WaitForSeconds(0.25f);
+
+            var player = FindObjectOfType<PlayerHealth>();
+            targetEntity = player;
+            if (targetEntity != null)
+                pathFinder.SetDestination(targetEntity.transform.position);
+            else if (targetEntity.dead || targetEntity == null)
+                pathFinder.SetDestination(transform.position);
+         
+
+            
+
+           
+            
         }
     }
 
@@ -100,7 +124,42 @@ public class Enemy : LivingEntity {
         GetComponent<Collider>().enabled = false;
     }
 
+
+
     private void OnTriggerStay(Collider other) {
-        // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
+        // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행  
+        
+        if(other.attachedRigidbody == null)
+        {
+            return;
+        }
+
+        LivingEntity livingEntity 
+        =  other.attachedRigidbody.GetComponent<LivingEntity>();
+
+        if (livingEntity.dead)
+            return;
+
+        if (dead)
+            return;
+
+        if (livingEntity != null && livingEntity == targetEntity)
+        {
+            if(lastAttackTime + timeBetAttack <= Time.time)
+            {
+                Vector3 hitposition
+                    = livingEntity.transform.position + Vector3.up;
+
+                Vector3 hitDirection
+                    = transform.position - livingEntity.transform.position;
+
+                livingEntity.OnDamage(damage, hitposition, hitDirection);
+
+                lastAttackTime = Time.time;
+
+
+
+            }
+        }
     }
 }
