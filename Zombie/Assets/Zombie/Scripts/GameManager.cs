@@ -34,6 +34,9 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Start() {
+
+        UIManager.instance.SetActiveGameoverUI(false);
+
         // 플레이어 캐릭터의 사망 이벤트 발생시 게임 오버
         FindObjectOfType<PlayerHealth>().onDeath += EndGame;
     }
@@ -57,4 +60,6 @@ public class GameManager : MonoBehaviour {
         // 게임 오버 UI를 활성화
         UIManager.instance.SetActiveGameoverUI(true);
     }
+
+   
 }

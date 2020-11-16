@@ -62,7 +62,8 @@ public class Gun : MonoBehaviour {
         {
             if(magAmmo > 0)
             {
-                Shot();
+                if (state == State.Ready)
+                    Shot();
 
                 // (수정. . ) 총알을 쏠때마다 탄창의 총알은 1씩 소모 
                 magAmmo -= 1;
@@ -147,7 +148,7 @@ public class Gun : MonoBehaviour {
     // 재장전 시도
     public bool Reload()
     {
-        int requiredAmmo = magCapacity - magAmmo;
+       
         // 총알이 전부 채워져 있다면, false 리턴
         // 총알이 전부 채우져 있지 않다면, 탄창에 총알을 채워넣는다. 
 
@@ -162,22 +163,9 @@ public class Gun : MonoBehaviour {
         }
         //탄창에 총알이 전부 채워져 있지 않다면. 
         else
-        {  
-            if (ammoRemain >= requiredAmmo) {
+        {
 
-                //남아 있는 총알 수가 탄창에 넣어야 할 총알 수 보다 크다면
-                // 탄창을 꽉 채우고 return true;
-                magAmmo = magCapacity;
-                ammoRemain -= requiredAmmo;
-            }
-            // 만약 그렇지 않다면
-            else 
-            { 
-                // 탄창에는 남아있는 총알 수 만큼 탄창을 채운다.
-
-                magAmmo = ammoRemain;
-                ammoRemain = 0;
-            }
+            StartCoroutine(ReloadRoutine());
 
             return true;
         }
@@ -185,13 +173,42 @@ public class Gun : MonoBehaviour {
     
     // 실제 재장전 처리를 진행
     private IEnumerator ReloadRoutine() {
+
+        int requiredAmmo = magCapacity - magAmmo;
+
         // 현재 상태를 재장전 중 상태로 전환
         state = State.Reloading;
-        
+
         // 재장전 소요 시간 만큼 처리를 쉬기
         yield return new WaitForSeconds(reloadTime);
 
+        if (ammoRemain >= requiredAmmo)
+        {
+
+            //남아 있는 총알 수가 탄창에 넣어야 할 총알 수 보다 크다면
+            // 탄창을 꽉 채우고 return true;
+            magAmmo = magCapacity;
+            ammoRemain -= requiredAmmo;
+        }
+        // 만약 그렇지 않다면
+        else
+        {
+            // 탄창에는 남아있는 총알 수 만큼 탄창을 채운다.
+
+            magAmmo = ammoRemain;
+            ammoRemain = 0;
+
+        }
+
+
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;
+
+
+    }
+
+    public void Update()
+    {
+        UIManager.instance.UpdateAmmoText(magAmmo, ammoRemain);
     }
 }

@@ -122,6 +122,11 @@ public class Enemy : LivingEntity {
 
         GetComponent<Rigidbody>().isKinematic = true;
         GetComponent<Collider>().enabled = false;
+
+        GameManager.instance.AddScore(100);
+        FindObjectOfType<EnemySpawner>().RemoveEnemy(this);
+
+        
     }
 
 
