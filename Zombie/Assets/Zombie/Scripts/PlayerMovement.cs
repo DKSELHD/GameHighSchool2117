@@ -33,14 +33,31 @@ public class PlayerMovement : MonoBehaviour {
 
     // 입력값에 따라 캐릭터를 앞뒤로 움직임
     private void Move() {
-        transform.position += transform.forward
-            * moveSpeed
-            * Time.fixedDeltaTime
+        transform.position += Vector3.forward
+            * moveSpeed * Time.fixedDeltaTime
             * playerInput.move;
+
+        transform.position += Vector3.right
+           * moveSpeed * Time.fixedDeltaTime
+           * playerInput.rotate;
+
+        return;
+
+
     }
 
     // 입력값에 따라 캐릭터를 좌우로 회전
     private void Rotate() {
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, 0);
+        float enter;
+        plane.Raycast(ray, out enter);
+        var point = ray.GetPoint(enter);
+        transform.LookAt(point);
+
+
+        return;
         transform.Rotate(0,
             rotateSpeed * Time.fixedDeltaTime * playerInput.rotate, 0);
     }
