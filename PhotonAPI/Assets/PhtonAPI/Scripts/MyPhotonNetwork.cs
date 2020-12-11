@@ -20,17 +20,18 @@ public class MyPhotonNetwork : MonoBehaviourPunCallbacks
     public void OnClickConnect()
     {
         Photon.Pun.PhotonNetwork.ConnectUsingSettings();
-
+        //Photon.Pun.PhotonNetwork.GameVersion = "test";
     }
 
-    public void OnClickDisonnect()
+    public void OnClickDisconnect()
     {
         Photon.Pun.PhotonNetwork.Disconnect();
     }
 
+
     public override void OnConnectedToMaster()
     {
-        if(PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnected)
         {
             PhotonNetwork.JoinRandomRoom();
         }
@@ -41,7 +42,6 @@ public class MyPhotonNetwork : MonoBehaviourPunCallbacks
         base.OnJoinRandomFailed(returnCode, message);
 
         PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2 });
-
     }
 
     public override void OnJoinedRoom()
@@ -50,5 +50,4 @@ public class MyPhotonNetwork : MonoBehaviourPunCallbacks
 
         PhotonNetwork.LoadLevel("Level_Test1");
     }
-   
 }
