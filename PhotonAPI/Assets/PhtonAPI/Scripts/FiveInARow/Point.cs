@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Point : MonoBehaviour
+//추가
+using Photon.Pun;
+
+//수정
+public class Point : MonoBehaviourPun
 {
     private LevelScript_FiveInARow m_LevelScript;
     public Vector2Int m_Point;
@@ -23,14 +27,19 @@ public class Point : MonoBehaviour
         {
             side = Side.Red;
         }
-        else if(m_LevelScript.m_Turn == Turn.Blue)
+        else if (m_LevelScript.m_Turn == Turn.Blue)
         {
             side = Side.Blue;
         }
 
-        m_LevelScript.LetGoOfTheHorse(side, m_Point);
+        //수정
+        //m_LevelScript.LetGoOfTheHorse(side, m_Point);
+        m_LevelScript.photonView.RPC("LetGoOfTheHorse", RpcTarget.All, (int)side,
+            m_Point.x, m_Point.y);
     }
 
+    //추가
+    [PunRPC]
     public void SetColor(float r, float g, float b)
     {
         var renderer = GetComponent<Renderer>();

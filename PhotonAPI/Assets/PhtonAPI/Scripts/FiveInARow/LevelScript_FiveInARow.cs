@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon;
+using Photon.Pun;
+using Photon.Realtime;
+
+using UnityEngine.UI;
 
 public enum Side
 {
@@ -15,8 +20,13 @@ public enum Turn
     Blue    //블루 턴
 }
 
-public class LevelScript_FiveInARow : MonoBehaviour
+public class LevelScript_FiveInARow :
+    MonoBehaviourPunCallbacks
 {
+    public Text m_PlayerUI;
+    public Text m_TurnUI;
+    public GameObject m_WinnerPnanel;
+    public Text m_WinnerUI;
     public Turn m_Turn;
 
     public Point[,] m_Board = new Point[21, 21];
@@ -34,13 +44,65 @@ public class LevelScript_FiveInARow : MonoBehaviour
 
             point.SetColor(1, 1, 1);
         }
+
+
+        //추가
+
+        //새로운 플레이어 인스턴트를 생성.
+        var playerObj = PhotonNetwork.Instantiate(
+            "Player",
+            Vector3.zero,
+            Quaternion.identity);
+
+        var player =
+        playerObj.GetComponent<Player_FiveARow>();
+
+        //새로 입장한 플레이어가 자신이라면,
+        if (PhotonNetwork.IsMasterClient)
+        {
+            //수정
+            player.photonView.RPC("SetPlayerInfo", RpcTarget.AllBuffered,
+                "Player_Red", (int)Side.Red);
+
+            m_PlayerUI.text = "Player Red";
+        }
+        else
+        {
+            //수정
+            player.photonView.RPC("SetPlayerInfo", RpcTarget.AllBuffered,
+                "Player_Blue", (int)Side.Blue);
+
+            m_PlayerUI.text = "Player Blue";
+        }
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            //추가
+            photonView.RPC("SetTurnUI", RpcTarget.AllBuffered, (int)m_Turn);
+            photonView.RPC("SetWinnerUI", RpcTarget.AllBuffered, true, "Ready!");
+        }
+        
+       
     }
 
 
+    //이 함수는 플레이어가 새로 룸에 입장했을 때 호출이되요.
+    public override void OnPlayerEnteredRoom(
+        Player newPlayer)
+    {
+        base.OnPlayerEnteredRoom(newPlayer);
 
+        //해당 PC가 호스트일 경우,
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.PlayerList.Length == 2)
+        {
+            photonView.RPC("SetWinnerUI", RpcTarget.AllBuffered, false, "Ready!");
+        }
+    }
 
     public void LetGoOfTheHorse(Side side, Vector2Int pos)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         if ((side == Side.Red && m_Turn == Turn.Red)
             || (side == Side.Blue && m_Turn == Turn.Blue))
         {
@@ -49,13 +111,19 @@ public class LevelScript_FiveInARow : MonoBehaviour
                 m_Board[pos.x, pos.y].m_Side = side;
 
                 if (side == Side.Red)
-                    m_Board[pos.x, pos.y].SetColor(1, 0, 0);
+                    m_Board[pos.x, pos.y].photonView.RPC("SetColor",
+                        RpcTarget.AllBuffered,
+                        1f, 0f, 0f);
                 else
-                    m_Board[pos.x, pos.y].SetColor(0, 0, 1);
+                    m_Board[pos.x, pos.y].photonView.RPC("SetColor",
+                        RpcTarget.AllBuffered,
+                        0f, 0f, 1f);
 
                 if (CheckVictory(side, pos))
                 {
                     Debug.Log("victory : " + side);
+
+                    photonView.RPC("SetWinnerUI", RpcTarget.AllBuffered, true, "Winner : " + side.ToString());
                 }
 
                 NextTurn();
@@ -68,10 +136,16 @@ public class LevelScript_FiveInARow : MonoBehaviour
         if (m_Turn == Turn.Red)
         {
             m_Turn = Turn.Blue;
+
+            //추가
+            photonView.RPC("SetTurnUI", RpcTarget.AllBuffered, (int)m_Turn);
         }
         else if (m_Turn == Turn.Blue)
         {
             m_Turn = Turn.Red;
+
+            //추가
+            photonView.RPC("SetTurnUI", RpcTarget.AllBuffered, (int)m_Turn);
         }
     }
 
@@ -87,11 +161,11 @@ public class LevelScript_FiveInARow : MonoBehaviour
             //위로 몇 번이나 반복되는지
             for (int i = 1; i < 5; i++)
             {
-                if (!InBoardRange(pos.x + i, pos.y))
+                if(!InBoardRange(pos.x, pos.y + i))
                 {
                     break;
                 }
-                if (m_Board[pos.x + i, pos.y].m_Side != side)
+                if(m_Board[pos.x, pos.y + i].m_Side != side)
                 {
                     break;
                 }
@@ -258,4 +332,21 @@ public class LevelScript_FiveInARow : MonoBehaviour
 
         return result;
     }
+
+    [PunRPC]
+
+    public void SetTurnUI(int side)
+    {
+        m_TurnUI.text = string.Format("Turn : {0}",
+            ((Side)side).ToString());
+
+    }
+
+    [PunRPC]
+    public void SetWinnerUI(bool activity, string message)
+    {
+        m_WinnerPnanel.SetActive(activity);
+        m_WinnerUI.text = message;
+    }
 }
+

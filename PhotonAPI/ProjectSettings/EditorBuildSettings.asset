@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Photon/Scenes/Level_Login.unity
-    guid: 19138b140d502ae46af64e175cdbfbae
+    path: Assets/PhtonAPI/Scenes/Level_Login.unity
+    guid: 42f6e51261ad5374f9ebebffbf85ef35
   - enabled: 1
-    path: Assets/Photon/Scenes/Level_Test1.unity
-    guid: 2c280b6087019ec4f934e03f6f63d335
+    path: Assets/PhtonAPI/Scenes/Level_FiveInARow.unity
+    guid: fb8681818e753eb419c476d3f393c69a
   m_configObjects: {}
